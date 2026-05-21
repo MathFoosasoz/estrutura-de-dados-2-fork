@@ -64,17 +64,26 @@ int compare_ge (int a, int b) {
 }
 
 /*--------------- Simple facilitators ---------------*/
-// Retorna o mínimo dos dois elementos
-
-#undef min
-#undef max
-#define min(a,b) (compare_l((a),(b))? (a) : (b))
-#define max(a,b) (compare_g((a), (b)) ? (a) : (b))
 
 // Retorna o módulo do elemento
 int abs (int a) {
     return compare_ge(a, 0) ? a: -a;
 }
+
+// Ordena 3 elementos
+void sort_three(int* a, int* b, int *c) {
+    if (compare_l(*b, *a))
+        swap(b, a);
+    if (compare_l(*c, *a))
+        swap(c, a);
+    if (compare_l(*c, *b))
+        swap(c, b);
+}
+
+#undef min
+#undef max
+#define min(a,b) (compare_l((a), (b)) ? (a) : (b))
+#define max(a,b) (compare_g((a), (b)) ? (a) : (b))
 
 /*--------------- Bit-wise facilitators ---------------*/
 // Pega o log2 de um número
@@ -126,10 +135,4 @@ bool is_sorted (int* array, int size) {
             return false;
         }
     return true;
-}
-
-void sort_three(int* a, int* b, int *c){
-    if (compare_l(b,a)) swap(b, a);
-    if (compare_l(c,a)) swap(c, a);
-    if (compare_l(c,b)) swap(c, b);
 }
