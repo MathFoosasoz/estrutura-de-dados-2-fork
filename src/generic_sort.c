@@ -3,7 +3,6 @@
 #include "headers/sorts_quadratic.h"
 #include "headers/utils.h"
 
-
 typedef struct {
     int size;
     int largest;

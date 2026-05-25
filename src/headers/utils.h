@@ -24,9 +24,11 @@ int compare_ge (int a, int b);               // Compara (>=) um elemento ao outr
 
 /*--------------- Simple facilitators ---------------*/
 int abs (int a);                             // Retorna o módulo do elemento
+void sort_three (int* a, int* b, int *c);    // Ordena 3 elementos
+
 #undef min
 #undef max
-#define min(a,b) (compare_l((a),(b))? (a) : (b))
+#define min(a,b) (compare_l((a), (b)) ? (a) : (b))
 #define max(a,b) (compare_g((a), (b)) ? (a) : (b))
 
 /*--------------- Bit-wise facilitators ---------------*/
