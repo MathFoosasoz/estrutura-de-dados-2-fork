@@ -24,10 +24,10 @@ void print_table (long long int** data, double* times) {
             "Recursive Calls     | %11lld | %11lld | %11lld | %11lld | %11lld | %11lld | %11lld \n",
             // Must cast it back so it uses the right float register
             times[0], times[1], times[2], times[3], times[4], times[5], times[6],
+            data[0][0], data[1][0], data[2][0], data[3][0], data[4][0], data[5][0], data[6][0],
             data[0][1], data[1][1], data[2][1], data[3][1], data[4][1], data[5][1], data[6][1],
             data[0][2], data[1][2], data[2][2], data[3][2], data[4][2], data[5][2], data[6][2],
-            data[0][3], data[1][3], data[2][3], data[3][3], data[4][3], data[5][3], data[6][3],
-            data[0][4], data[1][4], data[2][4], data[3][4], data[4][4],  data[5][4], data[6][4]
+            data[0][3], data[1][3], data[2][3], data[3][3], data[4][3], data[5][3], data[6][3]
           );
 }
 
@@ -44,6 +44,10 @@ void benchmark (int* array, int size) {
             "Results:\n"
             );
     // Aloca matrix de dados nº Sorts x nº métricas
+    // data[x][0] : comparações do sort x
+    // data[x][1] : atribuições do sort x
+    // data[x][2] : altura da árvore de recursão do sort x
+    // data[x][3] : número de nós na árvore de recursão do sort x
     long long int** data = (long long int**) calloc(7, sizeof(long long int*));
     double* times = (double*) calloc(7, sizeof(double));
     for (int i = 0; i < 7; i++)

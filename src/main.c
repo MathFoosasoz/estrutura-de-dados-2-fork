@@ -44,5 +44,9 @@ int main (int argc, char** argv) {
 
         print_parameters(dt);
         clear_counters();
+
+        free(name);
     }
+
+    free(array);
 }
