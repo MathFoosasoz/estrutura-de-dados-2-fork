@@ -1,4 +1,5 @@
 #include "headers/sorts_nlogn.h"
+#include "headers/utils.h"
 
 /*--------------- Quick Sort ---------------*/
 

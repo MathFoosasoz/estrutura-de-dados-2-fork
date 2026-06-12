@@ -1,4 +1,5 @@
 #include "headers/sorts_alternative.h"
+#include "headers/utils.h"
 
 /*--------------- Count Sort ---------------*/
 

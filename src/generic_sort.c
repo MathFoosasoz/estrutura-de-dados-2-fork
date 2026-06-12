@@ -1,41 +1,25 @@
-#include "headers/sorts_alternative.h"
 #include "headers/sorts_nlogn.h"
 #include "headers/sorts_quadratic.h"
-#include "headers/utils.h"
+#include "headers/sorts_alternative.h"
+#include "headers/generic_sort.h"
 
-typedef struct {
-    int size;
-    int largest;
-    int smallest;
-    int direct_inversion_count;
-    float mean;
-    unsigned int highest_bit;
-} Metrics;
-
-typedef enum {
-    SORT_RADIX,
-    SORT_COUNT,
-    SORT_MERGE,
-    SORT_QUICK
-} SortMethod;
-
-void get_metrics(const int* ar, const int n, Metrics* met){
+void get_metrics (const int* array, const int n, Metrics* met) {
     met->size = n;
     
     int smallest, largest;
-    smallest = largest = ar[n-1];
+    smallest = largest = array[n-1];
     int rep_count, inv_count;
-    unsigned int bit_accumulator = ar[n-1];
+    unsigned int bit_accumulator = array[n-1];
     rep_count = inv_count = 0;
 
-    float mean = ar[n-1];
+    float mean = array[n-1];
 
-    for(unsigned int i = 0; i < n-1; ++i){
-        smallest = min(smallest,ar[i]);
-        largest = max(largest,ar[i]);
-        inv_count += ar[i] > ar[i+1];   
-        bit_accumulator |= ar[i];   
-        mean += ar[i];
+    for (unsigned int i = 0; i < n-1; ++i) {
+        smallest = min(smallest, array[i]);
+        largest = max(largest, array[i]);
+        inv_count += array[i] > array[i+1];   
+        bit_accumulator |= array[i];   
+        mean += array[i];
     }
     mean /= n;
     
@@ -67,7 +51,7 @@ typedef enum {
 */
 // no total, 2n + k (2n + 2n + 256) = 2n(1 + 2k) + 256k
 
-long long radix_score(const Metrics* met){
+long long radix_score (const Metrics* met) {
     unsigned int k = fast_log2(met->highest_bit) / 8 + 1;
     int n = met->size;
     
@@ -85,7 +69,7 @@ long long radix_score(const Metrics* met){
 // Por fim, k operações.
 // No total, 7n + 2k
 
-long long count_score(const Metrics* met){
+long long count_score (const Metrics* met) {
     int k = met->largest - met->smallest;
     int n = met->size;
     
@@ -111,7 +95,7 @@ long long count_score(const Metrics* met){
 // então, o trabalho nesse andar k será a probabilidade de ser NÃO ser cortado multiplicado por 3k
 // infelizmente, isso tira a nossa recorrência. Teremos então que essa função de telemetria é O(log(n))
 
-long long merge_score(const Metrics* met){    
+long long merge_score (const Metrics* met) {
     int n = met -> size;
     
     float p = (float) met->direct_inversion_count / max(n-1.0f,1.0f);
@@ -128,7 +112,7 @@ long long merge_score(const Metrics* met){
     double probability_of_cut = 1.0f-p;
     int levels = fast_log2(n);
 
-    for(int k = 1; k <= levels; ++k){
+    for (int k = 1; k <= levels; ++k) {
         float execution_probability = 1.0f - probability_of_cut;
         work_arithmetic += n * execution_probability;
         work_assigns += 2.0f * n * execution_probability;
@@ -163,7 +147,7 @@ long long merge_score(const Metrics* met){
 // E estimamos o número de duplicatas (que são ruins para o quick sort). A gente consegue estimar isso ao ver a nossa range max - min. Por exemplo, se a range < n, sempre teremos no mínimo uma duplicata.
 // Temos então um número de repetições estimados de n - range, ou, 1 - range/n como taxa
 
-long long quick_sort_score(const Metrics* met){ 
+long long quick_sort_score (const Metrics* met) {
     int n = met->size;
 
     float expected_inversions = (n-1)/2.0f;
@@ -191,30 +175,34 @@ long long quick_sort_score(const Metrics* met){
 // Podemos pegar uma amostra constante (100 elementos, 1000 elementos, etc) mas isso introduz um erro na função ao passo que ele cresce.
 // E não podemos esquecer que insertion sort é O(n^2).
 
-
-void sort(int* ar, const int n){
-    if (n == 3){
-        sort_three(&ar[0],&ar[1],&ar[2]);
+SortMethod choose_sort (int* array, const int n) {
+    /*
+    if (n == 3) {
+        sort_three(&array[0],&array[1],&array[2]);
         return;
     }
+    */
 
-    if (n < 15){
-        insertion_sort(ar,n);
-        return;
+    if (n < 15) {
+        insertion_sort(array,n);
+        return SORT_INSERTION;
     }
 
     Metrics met;
-    get_metrics(ar,n,&met);
+    get_metrics(array, n, &met);
 
-    if(met.direct_inversion_count==0){
-        return;
+    if (met.direct_inversion_count == 0) {
+        return ALREADY_SORTED;
     }
-    if(met.direct_inversion_count == n-1){
-        for(int i = n - 1; i >= n/2; --i){
-            swap(&ar[i],&ar[n-i-1]);
+    /*
+    // Voltar a usar, mas definir como uma função sort?
+    if (met.direct_inversion_count == n-1) {
+        for (int i = n - 1; i >= n/2; --i) {
+            swap(&array[i],&array[n-i-1]);
         }
        return; 
     }
+    */
 
     long long scores[4]; 
     scores[SORT_RADIX] = radix_score(&met);
@@ -232,18 +220,21 @@ void sort(int* ar, const int n){
         }
     }
 
+    return best_method;
+    /*
     switch (best_method) {
         case SORT_RADIX:
-            interal_bytewise_radix_sort(ar, n, 5 - fast_log2(met.highest_bit) / 8 ); 
+            internal_bytewise_radix_sort(array, n, 5 - fast_log2(met.highest_bit) / 8 ); 
             break;
         case SORT_COUNT:
-            count_sort(ar, n); 
+            count_sort(array, n); 
             break;
         case SORT_MERGE:
-            merge_sort(ar, n); 
+            merge_sort(array, n); 
             break;
         case SORT_QUICK:
-            quick_sort(ar, n); 
+            quick_sort(array, n); 
             break;
     }
+    */
 }

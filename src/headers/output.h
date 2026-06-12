@@ -4,5 +4,5 @@
 #include "utils.h"
 
 double test_sort (Sort sort, int* array, int size);
-void print_table (long long int** data);
+void print_table (long long int** data, double* times);
 void benchmark (int* array, int size);

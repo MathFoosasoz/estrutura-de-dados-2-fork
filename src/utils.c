@@ -1,4 +1,38 @@
 #include "headers/utils.h"
+#include "headers/sorts_nlogn.h"
+#include "headers/sorts_quadratic.h"
+#include "headers/sorts_alternative.h"
+
+/*--------------- Sort Method ---------------*/
+// Pega a função pelo seu enum
+void get_sort_function (SortMethod choice, Sort* sort, char* sort_name) {
+    if (choice == SORT_RADIX) {
+        *sort = bytewise_radix_sort;
+        strcpy(sort_name, "RADIX SORT");
+    } else if (choice == SORT_COUNT) {
+        *sort = count_sort;
+        strcpy(sort_name, "COUNT SORT");
+    } else if (choice == SORT_MERGE) {
+        *sort = merge_sort;
+        strcpy(sort_name, "MERGE SORT");
+    } else if (choice == SORT_QUICK) {
+        *sort = quick_sort;
+        strcpy(sort_name, "QUICK SORT");
+    } else if (choice == SORT_BUBBLE) {
+        *sort = bubble_sort;
+        strcpy(sort_name, "BUBBLE SORT");
+    } else if (choice == SORT_SELECTION) {
+        *sort = selection_sort;
+        strcpy(sort_name, "SELECTION SORT");
+    } else if (choice == SORT_INSERTION) {
+        *sort = insertion_sort;
+        strcpy(sort_name, "INSERTION SORT");
+    } else {
+        printf("wtf?!\nI think you did something wrong\n");
+        exit(0);
+    }
+    return;
+}
 
 /*--------------- Counters ---------------*/
 long long int ctr_compare = 0;
@@ -80,10 +114,7 @@ void sort_three(int* a, int* b, int *c) {
         swap(c, b);
 }
 
-#undef min
-#undef max
-#define min(a,b) (compare_l((a), (b)) ? (a) : (b))
-#define max(a,b) (compare_g((a), (b)) ? (a) : (b))
+// Max e Min definidos como macro já no header
 
 /*--------------- Bit-wise facilitators ---------------*/
 // Pega o log2 de um número

@@ -1,5 +1,7 @@
 #include "headers/sorts_nlogn.h"
 #include "headers/sorts_quadratic.h"
+#include "headers/sorts_alternative.h"
+#include "headers/generic_sort.h"
 #include "headers/utils.h"
 #include "headers/input.h"
 #include "headers/output.h"
@@ -9,7 +11,7 @@ int main (int argc, char** argv) {
     int* array;
     int size = 0;
     char* input = NULL; // PATH do arquivo de entrada
-    int mode = 0; // Modo de operação: 0 = adaptativo, 1 = benchmark, 2 = quick, 3 = merge, 4 = bubble, 5 = selection, 6 = insertion
+    SortMethod mode = ADAPTATIVO;
 
     // Determina operação de acordo com as flags
     deal_with_flags(argc, argv, &input, &mode, &size);
@@ -25,43 +27,21 @@ int main (int argc, char** argv) {
 
 
 
-    if (mode == 1) {
-        // printf("#Todo\n");
-        // exit(0);
+    if (mode == BENCHMARK) {
         benchmark(array, size);
     }
     else {
-        if (mode == 0) {
-            printf("#Todo\n");
-            mode = 2; // Sends to Quick Sort
+        if (mode == ADAPTATIVO) {
+            mode = choose_sort(array, size);
             printf("Algoritmo escolhido pela heurística: ");
         }
         Sort sort;
-        char* name;
-        switch (mode) {
-        case 2:
-            sort = quick_sort;
-            name = "Quick Sort";
-            break;
-        case 3:
-            sort = merge_sort;
-            name = "Merge Sort";
-            break;
-        case 4:
-            sort = bubble_sort;
-            name = "Bubble Sort";
-            break;
-        case 5:
-            sort = selection_sort;
-            name = "Selection Sort";
-            break;
-        case 6:
-            sort = insertion_sort;
-            name = "Insertion Sort";
-            break;
-        }
+        char* name = (char*)calloc(32, sizeof(char));
+        get_sort_function(mode, &sort, name);
+
         printf("%s\n", name);
-        float dt = test_sort(sort, array, size);
+        double dt = test_sort(sort, array, size);
+
         print_parameters(dt);
         clear_counters();
     }

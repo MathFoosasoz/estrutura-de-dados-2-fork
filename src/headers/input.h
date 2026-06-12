@@ -1,5 +1,5 @@
 #include <string.h>
-#include "utils.h"
+#include <stdio.h>
 
 void deal_with_flags (int argc, char** argv, char** input, int* mode, int* size); // Lida com as flags da linha de comando
 int* read_file (char* input, int* size);           // Lê array de um arquivo

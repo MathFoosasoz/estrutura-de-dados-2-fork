@@ -1,4 +1,3 @@
-#include "utils.h"
 
 void quick_sort (int* array, int n);
 void quick_sort_iteration (int* array, int begin, int end, int depth);

@@ -1,7 +1,8 @@
 #include "headers/input.h"
+#include "headers/utils.h"
 
 // Lida com as flags da linha de comando
-void deal_with_flags (int argc, char** argv, char** input, int* mode, int* size) {
+void deal_with_flags (int argc, char** argv, char** input, SortMethod* mode, int* size) {
     bool error = false;
     bool help = false;
     for (int i = 1; i < argc; i++) {
@@ -39,21 +40,21 @@ void deal_with_flags (int argc, char** argv, char** input, int* mode, int* size)
                 break;
             }
             if (strstr(argv[i], "quick"))
-                *mode = 2;
+                *mode = SORT_QUICK;
             else if (strstr(argv[i], "merge"))
-                *mode = 3;
+                *mode = SORT_MERGE;
             else if (strstr(argv[i], "bubble"))
-                *mode = 4;
+                *mode = SORT_BUBBLE;
             else if (strstr(argv[i], "selection"))
-                *mode = 5;
+                *mode = SORT_SELECTION;
             else if (strstr(argv[i], "insertion"))
-                *mode = 6;
+                *mode = SORT_INSERTION;
             else
                 error = true;
         } else if (strcmp(argv[i], "--benchmark") == 0 || strcmp(argv[i], "-b") == 0) {
-            *mode = 1;
+            *mode = BENCHMARK;
         } else if (strcmp(argv[i], "--adaptativo") == 0 || strcmp(argv[i], "-A") == 0) {
-            *mode = 0;
+            *mode = ADAPTATIVO;
         } else
             error = true;
     }

@@ -15,7 +15,7 @@ double test_sort(Sort sort, int* array, int size) {
     return dt;
 }
 
-void print_table (long long int** data) {
+void print_table (long long int** data, double* times) {
     printf( "                    |    Quick    |    Merge    |    Bubble   |  Selection  |  Insertion  |    Count    | Bytewise Radix\n"
             "Time Taken          | %10lfs | %10lfs | %10lfs | %10lfs | %10lfs | %10lfs | %10lfs \n"
             "Comparisons         | %11lld | %11lld | %11lld | %11lld | %11lld | %11lld | %11lld \n"
@@ -23,7 +23,7 @@ void print_table (long long int** data) {
             "Max Recursion Depth | %11lld | %11lld | %11lld | %11lld | %11lld | %11lld | %11lld \n"
             "Recursive Calls     | %11lld | %11lld | %11lld | %11lld | %11lld | %11lld | %11lld \n",
             // Must cast it back so it uses the right float register
-            *(double*)&data[0][0], *(double*)&data[1][0], *(double*)&data[2][0], *(double*)&data[3][0], *(double*)&data[4][0], *(double*)&data[5][0], *(double*)&data[6][0],
+            times[0], times[1], times[2], times[3], times[4], times[5], times[6],
             data[0][1], data[1][1], data[2][1], data[3][1], data[4][1], data[5][1], data[6][1],
             data[0][2], data[1][2], data[2][2], data[3][2], data[4][2], data[5][2], data[6][2],
             data[0][3], data[1][3], data[2][3], data[3][3], data[4][3], data[5][3], data[6][3],
@@ -45,8 +45,9 @@ void benchmark (int* array, int size) {
             );
     // Aloca matrix de dados nº Sorts x nº métricas
     long long int** data = (long long int**) calloc(7, sizeof(long long int*));
+    double* times = (double*) calloc(7, sizeof(double));
     for (int i = 0; i < 7; i++)
-        data[i] = (long long int*) calloc(5, sizeof(long long int));
+        data[i] = (long long int*) calloc(4, sizeof(long long int));
 
     // Collect data
     double dt;
@@ -79,13 +80,17 @@ void benchmark (int* array, int size) {
         }
         // Store data
         dt = test_sort(sort, array, size);
-        data[i][0] = *(long long int*)&dt; // Just so it works; it's lazy, I know
-        data[i][1] = ctr_compare;
-        data[i][2] = ctr_assign;
-        data[i][3] = ctr_recursion_depth;
-        data[i][4] = ctr_recursion_call;
+        times[i] = dt; // Just so it works; it's lazy, I know
+        data[i][0] = ctr_compare;
+        data[i][1] = ctr_assign;
+        data[i][2] = ctr_recursion_depth;
+        data[i][3] = ctr_recursion_call;
         clear_counters();
         free(array_copy);
     }
-    print_table(data);
+    print_table(data, times);
+    for (int i = 0; i < 7; i++)
+        free(data[i]);
+    free(data);
+    free(times);
 }
