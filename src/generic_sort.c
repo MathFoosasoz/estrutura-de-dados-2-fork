@@ -284,7 +284,7 @@ void best_sort (int* array, const int n) {
 // "Cópia" da função anterior que retorna apenas o nome da função que seria escolhida
 // Usado para o benchmark
 
-SortMethod choose_sort (int* array, const int n) {
+SortMethod choose_sort (int* array, const int n, long long scores[]) {
     // Coleta métricas
     Metrics met;
     get_metrics(array, n, &met);
@@ -298,7 +298,6 @@ SortMethod choose_sort (int* array, const int n) {
     }
 
     // Pega scores de cada sort
-    long long scores[4]; 
     scores[SORT_RADIX] = radix_score(&met);
     scores[SORT_COUNT] = count_score(&met);
     scores[SORT_MERGE] = merge_score(&met);
