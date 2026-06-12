@@ -175,35 +175,132 @@ long long quick_sort_score (const Metrics* met) {
 // Podemos pegar uma amostra constante (100 elementos, 1000 elementos, etc) mas isso introduz um erro na função ao passo que ele cresce.
 // E não podemos esquecer que insertion sort é O(n^2).
 
-SortMethod choose_sort (int* array, const int n) {
-    /*
+void best_sort (int* array, const int n) {
+    time_t begin, end;
+    double dt, tot;
+    printf("---------- MODO ADAPTATIVO ----------\nTamanho do array: %d\n", n);
+    // Lida com casos simples
     if (n == 3) {
         sort_three(&array[0],&array[1],&array[2]);
+        printf("Caso trivial, apenas ordenei os 3\nContadores:\n");
+        print_counters();
         return;
     }
-    */
 
     if (n < 15) {
+        begin = clock();
         insertion_sort(array,n);
-        return SORT_INSERTION;
+        end = clock();
+        dt = (end - begin) / (double) CLOCKS_PER_SEC;
+        printf( "Algoritmo escolhido: INSERTION SORT\n"
+                "Tempo: %10lfs\n", dt);
+        print_counters();
+        return;
     }
 
+    // Coleta métricas
+    Metrics met;
+    begin = clock();
+    get_metrics(array, n, &met);
+    end = clock();
+    dt = (end - begin) / (double) CLOCKS_PER_SEC;
+    tot = dt;
+    printf("Tempo coletando métricas : %10lfs\n", dt);
+
+    if (met.direct_inversion_count == 0) {
+        printf("Caso trivial, o vetor já está ordenado\n");
+        return;
+    }
+
+    // Caso reversamente ordenado, já resolve
+    if (met.direct_inversion_count == n-1) {
+        printf("Reversamente ordenado? Trivial...\n");
+        begin = clock();
+        for (int i = n - 1; i >= n/2; --i) {
+            swap(&array[i],&array[n-i-1]);
+        }
+        end = clock();
+        dt = (end - begin) / (double) CLOCKS_PER_SEC;
+        printf("Tempo: %10lfs\nContadores:\n", dt);
+        print_counters();
+        return; 
+    }
+
+    // Pega scores de cada sort
+    begin = clock();
+    long long scores[4]; 
+    scores[SORT_RADIX] = radix_score(&met);
+    scores[SORT_COUNT] = count_score(&met);
+    scores[SORT_MERGE] = merge_score(&met);
+    scores[SORT_QUICK] = quick_sort_score(&met);
+    end = clock();
+    dt = (end - begin) / (double) CLOCKS_PER_SEC;
+    tot += dt;
+    printf("Tempo calculando scores  : %10lfs\n", dt);
+
+    SortMethod best_method = SORT_RADIX;
+    long long min_score = scores[SORT_RADIX];
+
+    // Vê qual foi o melhor
+    for (int i = 1; i < 4; ++i) {
+        if (scores[i] < min_score) {
+            min_score = scores[i];
+            best_method = (SortMethod)i;
+        }
+    }
+
+    // Ordena com o sort escolhido
+    begin = clock();
+    switch (best_method) {
+        case SORT_RADIX:
+            // Radix Sort, mas levemente otimizado
+            internal_bytewise_radix_sort(array, n, 5 - fast_log2(met.highest_bit) / 8 ); 
+            end = clock();
+            printf("Algoritmo escolhido: RADIX SORT\n");
+            break;
+        case SORT_COUNT:
+            count_sort(array, n); 
+            end = clock();
+            printf("Algoritmo escolhido: COUNT SORT\n");
+            break;
+        case SORT_MERGE:
+            merge_sort(array, n); 
+            end = clock();
+            printf("Algoritmo escolhido: MERGE SORT\n");
+            break;
+        case SORT_QUICK:
+            quick_sort(array, n); 
+            end = clock();
+            printf("Algoritmo escolhido: QUICK SORT\n");
+            break;
+    }
+    dt = (end - begin) / (double) CLOCKS_PER_SEC;
+    tot += dt;
+    printf( "Tempo de ordenação       : %10lfs\n"
+            "---------- Métricas totais ----------\n"
+            "Time Taken               : %10lfs\n"
+            "Contadores:\n",
+            dt, tot);
+    print_counters();
+}
+
+// "Cópia" da função anterior que retorna apenas o nome da função que seria escolhida
+// Usado para o benchmark
+
+SortMethod choose_sort (int* array, const int n) {
+    // Coleta métricas
     Metrics met;
     get_metrics(array, n, &met);
 
     if (met.direct_inversion_count == 0) {
         return ALREADY_SORTED;
     }
-    /*
-    // Voltar a usar, mas definir como uma função sort?
+    // Caso reversamente ordenado, já resolve
     if (met.direct_inversion_count == n-1) {
-        for (int i = n - 1; i >= n/2; --i) {
-            swap(&array[i],&array[n-i-1]);
-        }
-       return; 
+       return REVERSE_SORTED; 
     }
-    */
 
+    // Pega scores de cada sort
     long long scores[4]; 
     scores[SORT_RADIX] = radix_score(&met);
     scores[SORT_COUNT] = count_score(&met);
@@ -213,6 +310,7 @@ SortMethod choose_sort (int* array, const int n) {
     SortMethod best_method = SORT_RADIX;
     long long min_score = scores[SORT_RADIX];
 
+    // Vê qual foi o melhor
     for (int i = 1; i < 4; ++i) {
         if (scores[i] < min_score) {
             min_score = scores[i];
@@ -221,20 +319,4 @@ SortMethod choose_sort (int* array, const int n) {
     }
 
     return best_method;
-    /*
-    switch (best_method) {
-        case SORT_RADIX:
-            internal_bytewise_radix_sort(array, n, 5 - fast_log2(met.highest_bit) / 8 ); 
-            break;
-        case SORT_COUNT:
-            count_sort(array, n); 
-            break;
-        case SORT_MERGE:
-            merge_sort(array, n); 
-            break;
-        case SORT_QUICK:
-            quick_sort(array, n); 
-            break;
-    }
-    */
 }

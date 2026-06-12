@@ -10,9 +10,11 @@ void deal_with_flags (int argc, char** argv, char** input, SortMethod* mode, int
         if (argv[i][1] == '-')
             to_lowercase(argv[i]);
         // Interpreta flags
+        // help
         if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             help = true;
             break;
+        // input: array de entrada
         } else if (strcmp(argv[i], "--input") == 0 || strcmp(argv[i], "-i") == 0) {
             if (i < argc-1)
                 *input = argv[++i];
@@ -20,6 +22,7 @@ void deal_with_flags (int argc, char** argv, char** input, SortMethod* mode, int
                 error = true;
                 break;
             }
+        // tamanho: do array
         } else if (strcmp(argv[i], "--tamanho") == 0 || strcmp(argv[i], "-t") == 0) {
             if (i < argc-1)
                 *size = atoi(argv[++i]);
@@ -32,6 +35,7 @@ void deal_with_flags (int argc, char** argv, char** input, SortMethod* mode, int
                 error = true;
                 break;
             }
+        // algoritmo: fixa um para ordenar
         } else if (strcmp(argv[i], "--algoritmo") == 0 || strcmp(argv[i], "-a") == 0) {
             if (i < argc-1)
                 to_lowercase(argv[++i]);
@@ -49,10 +53,16 @@ void deal_with_flags (int argc, char** argv, char** input, SortMethod* mode, int
                 *mode = SORT_SELECTION;
             else if (strstr(argv[i], "insertion"))
                 *mode = SORT_INSERTION;
+            else if (strstr(argv[i], "count"))
+                *mode = SORT_COUNT;
+            else if (strstr(argv[i], "radix"))
+                *mode = SORT_RADIX;
             else
                 error = true;
+        // benchmark
         } else if (strcmp(argv[i], "--benchmark") == 0 || strcmp(argv[i], "-b") == 0) {
             *mode = BENCHMARK;
+        // adaptativo
         } else if (strcmp(argv[i], "--adaptativo") == 0 || strcmp(argv[i], "-A") == 0) {
             *mode = ADAPTATIVO;
         } else
@@ -65,16 +75,18 @@ void deal_with_flags (int argc, char** argv, char** input, SortMethod* mode, int
             printf("Try '%s --help' for more information.\n", argv[0]);
         // Help message
         if (help) {
-            printf( "Quando sem <file>, ou quando <file> é -, lê da entrada padrão."
+            printf( "Quando sem <file>, ou quando <file> é -, lê da entrada padrão.\n"
                     "Entrada:\n"
                     "    -i, --input <file>           Path <file> do arquivo de entrada\n" 
                     "    -t, --tamanho <tamanho>      Tamanho do array a ser ordenado\n"
                     "Operação:\n"
                     "    -a, --algoritmo <alg>        Fixa um algoritmo de ordenação <alg> dentre as opções:\n"
-                    "        quick\n"
-                    "        merge\n"
                     "        bubble\n"
+                    "        counting\n"
                     "        insertion\n"
+                    "        merge\n"
+                    "        quick\n"
+                    "        radix-bytewise\n"
                     "        selection\n"
                     "    -b, --benchmark              Usa todos os algoritmos de ordenação e compara suas métricas\n"
                     "    -A, --adaptativo             Usa heurísticas para determinar o melhor algoritmo; é a opção padrão\n"

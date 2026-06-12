@@ -11,7 +11,7 @@ void get_sort_function (SortMethod choice, Sort* sort, char* sort_name) {
         strcpy(sort_name, "RADIX SORT");
     } else if (choice == SORT_COUNT) {
         *sort = count_sort;
-        strcpy(sort_name, "COUNT SORT");
+        strcpy(sort_name, "COUNTING SORT");
     } else if (choice == SORT_MERGE) {
         *sort = merge_sort;
         strcpy(sort_name, "MERGE SORT");
@@ -27,6 +27,12 @@ void get_sort_function (SortMethod choice, Sort* sort, char* sort_name) {
     } else if (choice == SORT_INSERTION) {
         *sort = insertion_sort;
         strcpy(sort_name, "INSERTION SORT");
+    } else if (choice == ALREADY_SORTED) {
+        *sort = quick_sort; // Should not be used, but let's make it quick in case someone tries to break the code
+        strcpy(sort_name, "ALREADY SORTED");
+    } else if (choice == REVERSE_SORTED) {
+        *sort = quick_sort; // Should not be used, but let's make it quick in case someone tries to break the code
+        strcpy(sort_name, "REVERSE SORTED");
     } else {
         printf("wtf?!\nI think you did something wrong\n");
         exit(0);
@@ -39,6 +45,7 @@ long long int ctr_compare = 0;
 long long int ctr_assign = 0;
 long long int ctr_recursion_depth = 0;
 long long int ctr_recursion_call = 0;
+long long int ctr_mem_alloc = 0;
 
 /*--------------- Counter-related Functions ---------------*/
 // Limpa os contadores
@@ -47,6 +54,18 @@ void clear_counters() {
     ctr_assign = 0;
     ctr_recursion_depth = 0;
     ctr_recursion_call = 0;
+    ctr_mem_alloc = 0;
+}
+
+// Printa os contadores
+void print_counters() {
+    printf( "Comparisons         | %11lld\n"
+            "Assignments         | %11lld\n"
+            "Max Recursion Depth | %11lld\n"
+            "Recursive Calls     | %11lld\n"
+            "Memory Allocated    | %11lld\n",
+            ctr_compare, ctr_assign, ctr_recursion_depth, ctr_recursion_call, ctr_mem_alloc
+            );
 }
 
 // Printa os contadores e o tempo

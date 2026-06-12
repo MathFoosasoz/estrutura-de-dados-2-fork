@@ -73,13 +73,17 @@ int partition (int* array, int begin, int end) {
 /*--------------- Merge Sort ---------------*/
 
 // Apenas uma função no mesmo padrão de parâmetros das outras
-// para deixar o código mais limpo
+// para deixar o código mais limpo e alocar um array temporário "estático"
 void merge_sort (int* array, int n) {
-	merge_sort_iteration(array, 0, n-1, 0);
+    // Aloca array temporário que o merge precisa, mas evita chamar a malloc a cada recursão
+    int* temp_array = malloc(n * sizeof(int));
+    ctr_mem_alloc += n;
+	merge_sort_iteration(array, 0, n-1, 0, temp_array);
+	free(temp_array);
 }
 
 // Divide recursivamente sobre suas metades e as junta depois
-void merge_sort_iteration (int* array, int begin, int end, int depth) {
+void merge_sort_iteration (int* array, int begin, int end, int depth, int* temp_array) {
     // Contadores
     ctr_recursion_call++;
     if (depth > ctr_recursion_depth)
@@ -87,18 +91,17 @@ void merge_sort_iteration (int* array, int begin, int end, int depth) {
     // O sort em si
 	if (begin < end) {
 		int middle = (begin+end)/2;
-		merge_sort_iteration(array, begin, middle, depth+1);
-		merge_sort_iteration(array, middle+1, end, depth+1);
+		merge_sort_iteration(array, begin, middle, depth+1, temp_array);
+		merge_sort_iteration(array, middle+1, end, depth+1, temp_array);
 		if (array[middle] <= array[middle+1]) return;
-		merge(array, begin, end);
+		merge(array, begin, end, temp_array);
 	}
 }
 
 // Junta duas metades já ordenadas em um único array ordenado
 // Para tal, requer um array temporário, o qual foi alocado
 // estaticamente para maior eficiência
-void merge (int* array, int begin, int end) {
-	static int temp_array[10000000]; // Do better... (#define something)
+void merge (int* array, int begin, int end, int* temp_array) {
 	int middle = (begin+end)/2;
 	int i = begin;
 	int j = begin;

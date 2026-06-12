@@ -24,6 +24,7 @@ void count_sort (int* array, const int n) {
     // se indexa através de bucket[abs(array[i] - smallest)], que tem index 0 e abs(largest-smallest)
     const int bucket_size = abs(largest - smallest) + 1;
     int* bucket = (int*) calloc(bucket_size, sizeof(int));
+    ctr_mem_alloc += bucket_size;
     if (bucket == NULL) {
         printf("Error allocating auxiliary array on Count Sort\nIs it too big or just random error?\n");
         exit(0);
@@ -50,6 +51,7 @@ int radix_bucket[256];
 
 
 void bytewise_radix_sort(int* array, const int n){
+    ctr_mem_alloc += 256; // Bucket
     internal_bytewise_radix_sort(array,n,0);
 }
 
@@ -63,6 +65,7 @@ void bytewise_radix_sort(int* array, const int n){
 
 void internal_bytewise_radix_sort (int* array, const int n, const unsigned char skippable_bytes) {
     int* tmp = calloc(n, sizeof(int));
+    ctr_mem_alloc += n;
 
     // radix sort tem o problema que ele não sabe discernir números negativos de positivos.
     // se tratarmos o bit de sinal como um bit de valor (ex: -3 = (1) 11 = 111 = 5), teremos problema de ordenação, já que todo
@@ -73,7 +76,7 @@ void internal_bytewise_radix_sort (int* array, const int n, const unsigned char 
     }
 
     for (unsigned char byte_idx = 0; byte_idx < 4 - skippable_bytes; ++byte_idx) {
-        memset(radix_bucket, 0, 256 * sizeof(int)); 
+        memset(radix_bucket, 0, 256 * sizeof(int)); // Desprezado nos counters
         for (int i = 0; i < n; ++i) {
             unsigned char current_byte = get_nth_byte(array[i], byte_idx);
             radix_bucket[current_byte]++;
@@ -81,11 +84,11 @@ void internal_bytewise_radix_sort (int* array, const int n, const unsigned char 
         for (int i = 1; i < 256; ++i) {
             radix_bucket[i] += radix_bucket[i-1];
         }
-        for (int i = n-1; i >=0; --i) {
+        for (int i = n-1; i >= 0; --i) {
             unsigned char current_byte = get_nth_byte(array[i], byte_idx);
-            tmp[--radix_bucket[current_byte]] = array[i];
+            assign(&tmp[--radix_bucket[current_byte]], array[i]);
         }
-        memcpy(array, tmp, n * sizeof(int));
+        memcpy(array, tmp, n * sizeof(int)); // Desprezado nos counters
     }
 
     // isso desfaz a inversão que fizemos no começo

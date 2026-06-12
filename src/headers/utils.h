@@ -21,7 +21,8 @@ typedef enum {
     SORT_BUBBLE = 4,     // n^2
     SORT_SELECTION = 5,  // n^2
     SORT_INSERTION = 6,  // n^2
-    ALREADY_SORTED = 7   // Caso, quando definindo as métricas, assim se perceba
+    ALREADY_SORTED = 7,  // Caso, quando definindo as métricas, assim se perceba
+    REVERSE_SORTED = 8   // Caso, quando definindo as métricas, assim se perceba
 } SortMethod;
 
 #endif
@@ -33,9 +34,11 @@ extern long long int ctr_compare;            // Contador de comparações
 extern long long int ctr_assign;             // Contador de atribuções
 extern long long int ctr_recursion_depth;    // Contador da profundidade da recursão
 extern long long int ctr_recursion_call;     // Contador do número de chamadas recursivas
+extern long long int ctr_mem_alloc;          // Contador de memória alocada
 
 /*--------------- Counter-related Functions ---------------*/
 void clear_counters();                       // Limpa os contadores
+void print_counters();                       // Printa os contadores
 void print_parameters (double dt);           // Printa os contadores e o tempo
 void assign (int* a, int b);                 // Atribui um elemento ao outro e conta a operação
 void swap (int* a,int *b);                   // Troca um elemento com outro e conta as operações

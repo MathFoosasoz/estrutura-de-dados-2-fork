@@ -22,19 +22,11 @@ int main (int argc, char** argv) {
     else
         array = read_file(input, &size);
 
-    // printf("Array size: %d\n", size);
-    // print_array(array, size);
-
-
-
     if (mode == BENCHMARK) {
         benchmark(array, size);
-    }
-    else {
-        if (mode == ADAPTATIVO) {
-            mode = choose_sort(array, size);
-            printf("Algoritmo escolhido pela heurística: ");
-        }
+    } else if (mode == ADAPTATIVO) {
+        best_sort(array, size);
+    } else {
         Sort sort;
         char* name = (char*)calloc(32, sizeof(char));
         get_sort_function(mode, &sort, name);
@@ -44,5 +36,8 @@ int main (int argc, char** argv) {
 
         print_parameters(dt);
         clear_counters();
+
+        free(name);
     }
+    free(array);
 }
