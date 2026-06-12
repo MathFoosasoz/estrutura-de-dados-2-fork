@@ -50,9 +50,16 @@ void benchmark (int* array, int size) {
     // Vê qual sort a heurística escolheria
     Sort sort; // Só usa realmente depois
     char* name = (char*)calloc(32, sizeof(char));
-    SortMethod heuristic_sort = choose_sort(array, size), best_sort;
+    long long scores[4];
+    SortMethod heuristic_sort = choose_sort(array, size, scores), best_sort;
     get_sort_function(heuristic_sort, &sort, name);
-    printf("Algoritmo escolhido pela heurística: %s\n", name);
+    printf( "Scores determinados pela heurística:\n"
+            "Radix sort: %11lld\n"
+            "Count sort: %11lld\n"
+            "Merge sort: %11lld\n"
+            "Quick sort: %11lld\n"
+            "Algoritmo escolhido pela heurística (mínimo score): %s\n",
+            scores[0], scores[1], scores[2], scores[3], name);
 
     // Aloca matrix de dados nº Sorts x nº métricas
     // data[x][0] : comparações do sort x
