@@ -2,9 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <direct.h>
 #include <errno.h>
 #include "headers/write.h"
+#ifdef _WIN32
+    #include <direct.h>
+#else
+    #include <sys/stat.h>
+#endif
 
 void ensure_dir(const char *path) {
 #ifdef _WIN32
