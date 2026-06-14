@@ -6,10 +6,12 @@
 #include "headers/generate.h"
 #include "headers/write.h" 
 
+#define COUNT_MAX 1000000000
+
 int sizes [] = { 4, 8, 16, 32, 64,
      128, 256, 512, 1024, 1 << 11, 
     1 << 12, 1<<13, 1<<14,  1<<15,
-    1<<16, 1<<17, 1<<18, 1<<19, 1<<20};
+    1<<16, 1<<17};
 
 static void swap(int *a, int *b) {
     int tmp = *a; *a = *b; *b = tmp;
@@ -33,7 +35,7 @@ void make_random_small_range(void) {
 
 void make_random_full_range(void) {
     printf("Gerando: Aleatório com range grande\n");
-        for (int s = 0; s < sizeof(sizes) / sizeof(sizes[0]); s++) {
+    for (int s = 0; s < sizeof(sizes) / sizeof(sizes[0]); s++) {
         int n = sizes[s];
         int *arr = malloc(n * sizeof(int));
         if (arr == NULL) {
@@ -61,11 +63,11 @@ void make_almost_sorted(void) {
         arr[i] = (start + i);
             int swaps = (n * 5) / 100;
         if (swaps < 1) swaps = 1;
-         for (int i = 0; i < swaps; i++) {
-        int a = rand() % n;
-        int b = rand() % n;
-        swap(&arr[a], &arr[b]);
-    }
+        for (int i = 0; i < swaps; i++) {
+            int a = rand() % n;
+            int b = rand() % n;
+            swap(&arr[a], &arr[b]);
+        }
         write_array("casos_almost_sorted", arr, n);
         free(arr);
     }
@@ -82,14 +84,14 @@ void make_almost_rev_sorted(void) {
         }
         int start = n + (rand() % 1000);
         for (int i = 0; i < n; i++)
-        arr[i] = (start - i);
-                    int swaps = (n * 5) / 100;
-        if (swaps < 1) swaps = 1;
-         for (int i = 0; i < swaps; i++) {
-        int a = rand() % n;
-        int b = rand() % n;
-        swap(&arr[a], &arr[b]);
-    }
+            arr[i] = (start - i);
+            int swaps = (n * 5) / 100;
+            if (swaps < 1) swaps = 1;
+            for (int i = 0; i < swaps; i++) {
+            int a = rand() % n;
+            int b = rand() % n;
+            swap(&arr[a], &arr[b]);
+        }
         write_array("casos_almost_reverse_sorted", arr, n);
         free(arr);
     }
@@ -115,7 +117,7 @@ void make_fully_reversed(void) {
 
 void make_repetition(void) {
     printf("Gerando: 50 por cento repetição\n");
-        for (int s = 0; s < sizeof(sizes) / sizeof(sizes[0]); s++) {
+    for (int s = 0; s < sizeof(sizes) / sizeof(sizes[0]); s++) {
         int n = sizes[s];
         int *arr = malloc(n * sizeof(int));
         if (arr == NULL) {
@@ -159,33 +161,35 @@ void make_antiquick(void) {
             fprintf(stderr, "Erro na alocação de memória!\n");
             return;
         } 
-    for (int i = 0; i < n / 2; i++)  
-    arr[i]      = i * 2;
+        for (int i = 0; i < n / 2; i++)  
+        arr[i]      = i * 2;
 
-    for (int i = n / 2; i < n; i++)  
-    arr[i]      = (n - 1 - i) * 2 + 1;
-    write_array("casos_antiquick", arr, n);
-    free(arr);
-}
+        for (int i = n / 2; i < n; i++)  
+            arr[i]      = (n - 1 - i) * 2 + 1;
+        write_array("casos_antiquick", arr, n);
+        free(arr);
+    }
 }
 
 void make_anticount(void) {
     printf("Gerando: anti counting sort\n");
-for (int s = 0; s < sizeof(sizes) / sizeof(sizes[0]); s++) {
-    int n = sizes[s];
-    int *arr = malloc(n * sizeof(int));
-    if (arr == NULL) {fprintf(stderr, "Erro na alocação de memória!\n");
-            return;}
+    for (int s = 0; s < sizeof(sizes) / sizeof(sizes[0]); s++) {
+        int n = sizes[s];
+        int *arr = malloc(n * sizeof(int));
+        if (arr == NULL) {
+            fprintf(stderr, "Erro na alocação de memória!\n");
+            return;
+        }
 
-    arr[0] = - INT_MAX;
-    arr[n-1] = INT_MAX;
-    for (int i = 1; i < n - 1; i++)
-        arr[i] = rand() % (INT_MAX / 2);
-    for (int i = n - 1; i > 0; i--) {
-        int j = rand() % (i + 1);
-        swap(&arr[i], &arr[j]);
+        arr[0] = - COUNT_MAX;
+        arr[n-1] = COUNT_MAX;
+        for (int i = 1; i < n - 1; i++)
+            arr[i] = rand() % (COUNT_MAX / 2);
+        for (int i = n - 1; i > 0; i--) {
+            int j = rand() % (i + 1);
+            swap(&arr[i], &arr[j]);
+        }
+        write_array("casos_anticount", arr, n);
+        free(arr);
     }
-    write_array("casos_anticount", arr, n);
-    free(arr);
-}
 }

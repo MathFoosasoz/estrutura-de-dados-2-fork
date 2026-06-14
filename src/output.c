@@ -35,7 +35,7 @@ double test_sort(Sort sort, int* array, int size, bool kill_on_null) {
 
 bool error_flags[7];
 double times[7];
-long long int data[5][7];
+long long int data[6][7];
 
 const char* metrics_str[] = {
     "Time Taken",
@@ -43,14 +43,15 @@ const char* metrics_str[] = {
     "Assignments",
     "Max Recursion Depth",
     "Recursive Calls",
-    "Memory Allocated"
+    "Memory Allocated",
+    "Score"
 };
 
 // tabela auxiliar para printar o arquivo escolha_heuristica.txt
 // os índices correspondem à enum SortMethod
 
 const char* sorts_table_heuristic[] = {
-    "BYTEWISE RADIX SORT",
+    "RADIX SORT",
     "COUNTING SORT",
     "MERGE SORT",
     "QUICK SORT",
@@ -77,11 +78,11 @@ void print_table() {
     
     printf("\n");
 
-    for (int j = 0; j < 5; j++) {
+    for (int j = 0; j < 6; j++) {
         printf("%-20s", metrics_str[j+1]);
 
         for (int k = 0; k < 7; k++) {
-            if (!error_flags[k])
+            if (!error_flags[k] || j == 5)
                 printf("| %11lld ", data[j][k]);
             else
                 printf("| %11s ", "(ERRO)");
@@ -110,7 +111,7 @@ void write_to_file(const char* filename) {
             fprintf(file, ",(ERRO)");
     }
 
-    for (int j = 0; j < 5; j++) {
+    for (int j = 0; j < 6; j++) {
         fprintf(
             file,
             "\n"
@@ -118,7 +119,7 @@ void write_to_file(const char* filename) {
         );
 
         for (int k = 0; k < 7; k++) {
-            if (!error_flags[k])
+            if (!error_flags[k] || j == 5)
                 fprintf(file, ",%lld", data[j][k]);
             else
                 fprintf(file, ",(ERRO)");
@@ -156,6 +157,16 @@ void benchmark (int* array, int size, bool output_to_file, bool kill_on_null) {
             "Quick sort: %11lld\n"
             "Algoritmo escolhido pela heurística (mínimo score): %s\n",
             scores[0], scores[1], scores[2], scores[3], name);
+
+    // data[6] = {scores[3], scores[2], 0, 0, 0, scores[1], scores[0]};
+
+    data[5][0] = scores[3];
+    data[5][1] = scores[2];
+    data[5][2] = 0;
+    data[5][3] = 0;
+    data[5][4] = 0;
+    data[5][5] = scores[1];
+    data[5][6] = scores[0];
 
     // Collect data
     double dt, delta, heuristic_time, best_time = -1;
