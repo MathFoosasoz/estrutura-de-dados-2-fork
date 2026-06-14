@@ -132,7 +132,7 @@ void write_to_file(const char* filename) {
 
     for (int k = 0; k < 7; k++) {
         if (!error_flags[k])
-            fprintf(file, ",%.15lf", times[k]);
+            fprintf(file, ",%.9lf", times[k]);
         else
             fprintf(file, ",(ERRO)");
     }
@@ -199,10 +199,9 @@ void benchmark (int* array, int size, bool output_to_file, bool kill_on_null) {
     double dt, delta, heuristic_time, best_time = -1;
     int* array_copy;
     for (int i = 0; i < 7; i++) {
-        SortMethod sort_name;
+        SortMethod sort_name = i;
         array_copy = copy_array(array, size);
-        
-        get_sort_function(i, &sort, NULL);
+        get_sort_function(sort_name, &sort, NULL);
         // Store data
         dt = test_sort(sort, array_copy, size, false);
 
