@@ -27,7 +27,7 @@ int main (int argc, char** argv) {
     if (mode == BENCHMARK) {
         benchmark(array, size, output_to_file, kill_on_null);
     } else if (mode == ADAPTATIVO) {
-        best_sort(array, size);
+        generic_sort(array, size);
     } else {
         Sort sort;
         char* name = (char*)calloc(32, sizeof(char));

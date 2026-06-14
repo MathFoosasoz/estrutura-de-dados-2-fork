@@ -181,7 +181,7 @@ long long bubble_sort_score (const Metrics* met){
 // Podemos pegar uma amostra constante (100 elementos, 1000 elementos, etc) mas isso introduz um erro na função ao passo que ele cresce.
 // E não podemos esquecer que insertion sort é O(n^2).
 
-void best_sort (int* array, const int n) {
+void generic_sort (int* array, const int n) {
     time_t begin, end;
     double dt, tot;
     printf("---------- MODO ADAPTATIVO ----------\nTamanho do array: %d\n", n);

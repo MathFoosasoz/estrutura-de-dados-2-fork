@@ -34,5 +34,5 @@ long long radix_score (const Metrics* met);
 long long count_score (const Metrics* met);
 long long merge_score (const Metrics* met);
 long long quick_sort_score (const Metrics* met);
-void best_sort (int* array, const int n);
+void generic_sort (int* array, const int n);
 SortMethod choose_sort (int* array, const int n, long long scores[]);
