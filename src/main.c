@@ -13,9 +13,10 @@ int main (int argc, char** argv) {
     char* input = NULL; // PATH do arquivo de entrada
     bool output_to_file = false;
     SortMethod mode = ADAPTATIVO;
+    bool kill_on_null = false;
 
     // Determina operação de acordo com as flags
-    deal_with_flags(argc, argv, &input, &mode, &size, &output_to_file);
+    deal_with_flags(argc, argv, &input, &mode, &size, &output_to_file, &kill_on_null);
 
     // Lê array
     if (input == NULL || strcmp(input, "-") == 0)
@@ -24,7 +25,7 @@ int main (int argc, char** argv) {
         array = read_file(input, &size);
 
     if (mode == BENCHMARK) {
-        benchmark(array, size, output_to_file);
+        benchmark(array, size, output_to_file, kill_on_null);
     } else if (mode == ADAPTATIVO) {
         best_sort(array, size);
     } else {
@@ -33,7 +34,7 @@ int main (int argc, char** argv) {
         get_sort_function(mode, &sort, name);
 
         printf("%s\n", name);
-        double dt = test_sort(sort, array, size);
+        double dt = test_sort(sort, array, size, kill_on_null);
 
         print_parameters(dt);
         clear_counters();

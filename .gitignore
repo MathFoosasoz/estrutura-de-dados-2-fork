@@ -4,3 +4,14 @@ src/bkp*
 src/headers/bkp*
 main
 main.exe
+gerador
+gerador.exe
+casos_almost_reverse_sorted/
+casos_almost_sorted/
+casos_anticount/
+casos_antimerge/
+casos_antiquick/
+casos_fully_reversed/
+casos_random_full_range/
+casos_random_small_range/
+casos_repetition_50pct/

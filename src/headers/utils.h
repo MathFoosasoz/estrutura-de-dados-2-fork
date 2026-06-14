@@ -35,6 +35,7 @@ extern long long int ctr_assign;             // Contador de atribuções
 extern long long int ctr_recursion_depth;    // Contador da profundidade da recursão
 extern long long int ctr_recursion_call;     // Contador do número de chamadas recursivas
 extern long long int ctr_mem_alloc;          // Contador de memória alocada
+extern bool          sort_abort;             // Flag de sort abortado
 
 /*--------------- Counter-related Functions ---------------*/
 void clear_counters();                       // Limpa os contadores
@@ -46,6 +47,8 @@ int compare_l (int a, int b);                // Compara (<) um elemento ao outro
 int compare_le (int a, int b);               // Compara (<=) um elemento ao outro e conta a operação
 int compare_g (int a, int b);                // Compara (>) um elemento ao outro e conta a operação
 int compare_ge (int a, int b);               // Compara (>=) um elemento ao outro e conta a operação
+int* mem_alloc(size_t length);               // Aloca um vetor auxiliar e atualiza o contador
+int* clr_alloc(size_t length);               // Aloca um vetor auxiliar limpo e atualiza o contador
 
 /*--------------- Simple facilitators ---------------*/
 int abs (int a);                             // Retorna o módulo do elemento

@@ -76,8 +76,12 @@ int partition (int* array, int begin, int end) {
 // para deixar o código mais limpo e alocar um array temporário "estático"
 void merge_sort (int* array, int n) {
     // Aloca array temporário que o merge precisa, mas evita chamar a malloc a cada recursão
-    int* temp_array = malloc(n * sizeof(int));
-    ctr_mem_alloc += n;
+    int* temp_array = mem_alloc(n);
+
+	// Caso o computador não forneça a memória necessária, o sort não pode ser executado.
+	if (sort_abort)
+		return;
+
 	merge_sort_iteration(array, 0, n-1, 0, temp_array);
 	free(temp_array);
 }

@@ -46,6 +46,7 @@ long long int ctr_assign = 0;
 long long int ctr_recursion_depth = 0;
 long long int ctr_recursion_call = 0;
 long long int ctr_mem_alloc = 0;
+bool          sort_abort = false;
 
 /*--------------- Counter-related Functions ---------------*/
 // Limpa os contadores
@@ -55,6 +56,7 @@ void clear_counters() {
     ctr_recursion_depth = 0;
     ctr_recursion_call = 0;
     ctr_mem_alloc = 0;
+    sort_abort = false;
 }
 
 // Printa os contadores
@@ -70,6 +72,13 @@ void print_counters() {
 
 // Printa os contadores e o tempo
 void print_parameters (double dt) {
+    if (sort_abort) {
+        printf(
+            "O algoritmo foi abortado (motivo: não foi possível alocar memória auxiliar.)\n"
+        );
+        return;
+    }
+
     printf( "Time taken          : %.8fs\n"
             "Comparisons         : %lld\n"
             "Assignments         : %lld\n"
@@ -114,6 +123,36 @@ int compare_g (int a, int b) {
 int compare_ge (int a, int b) {
     ctr_compare++;
     return a >= b;
+}
+
+int* mem_alloc(size_t length) {
+    if (length == 0)
+        return NULL;
+
+    int* array = malloc(length * sizeof(int));
+
+    if (array == NULL) {
+        sort_abort = true;
+        return NULL;
+    } else {
+        ctr_mem_alloc += length;
+        return array;
+    }
+}
+
+int* clr_alloc(size_t length) {
+    if (length == 0)
+        return NULL;
+
+    int* array = calloc(sizeof(int), length);
+
+    if (array == NULL) {
+        sort_abort = true;
+        return NULL;
+    } else {
+        ctr_mem_alloc += length;
+        return array;
+    }
 }
 
 /*--------------- Simple facilitators ---------------*/

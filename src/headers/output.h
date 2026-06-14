@@ -4,6 +4,5 @@
 #include "generic_sort.h"
 #include "utils.h"
 
-double test_sort (Sort sort, int* array, int size);
-void print_table (long long int** data, double* times);
-void benchmark (int* array, int size, bool output_to_file);
+double test_sort (Sort sort, int* array, int size, bool kill_on_null);
+void benchmark (int* array, int size, bool output_to_file, bool kill_on_null);

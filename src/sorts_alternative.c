@@ -22,15 +22,13 @@ void count_sort (int* array, const int n) {
 
     // então, ao invés de indexar os valores como bucket[array[i]], que tem index i e [smallest,largest],
     // se indexa através de bucket[abs(array[i] - smallest)], que tem index 0 e abs(largest-smallest)
-    const int bucket_size = abs(largest - smallest) + 1;
-    int* bucket = (int*) calloc(bucket_size, sizeof(int));
-    ctr_mem_alloc += bucket_size;
-    if (bucket == NULL) {
-        printf("Error allocating auxiliary array on Count Sort\nIs it too big or just random error?\n");
-        exit(0);
-    }
+    const size_t bucket_size = (size_t)largest - (size_t)smallest + 1;
+    int* bucket = clr_alloc(bucket_size);
+    if (sort_abort)
+        return;
+
     for (int i = 0; i < n; ++i) {
-        int normalized_index = abs(array[i] - smallest);
+        size_t normalized_index = (size_t)array[i] - (size_t)smallest;
         // bucket é 0-inicializado pelo calloc
         bucket[normalized_index]++;
     }
@@ -64,8 +62,9 @@ void bytewise_radix_sort(int* array, const int n){
 // memória auxiliar: O(n)
 
 void internal_bytewise_radix_sort (int* array, const int n, const unsigned char skippable_bytes) {
-    int* tmp = calloc(n, sizeof(int));
-    ctr_mem_alloc += n;
+    int* tmp = clr_alloc(n);
+    if (sort_abort)
+        return;
 
     // radix sort tem o problema que ele não sabe discernir números negativos de positivos.
     // se tratarmos o bit de sinal como um bit de valor (ex: -3 = (1) 11 = 111 = 5), teremos problema de ordenação, já que todo
