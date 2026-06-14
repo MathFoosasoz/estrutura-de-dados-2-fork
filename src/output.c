@@ -33,7 +33,31 @@ void print_table (long long int** data, double* times) {
           );
 }
 
-void benchmark (int* array, int size) {
+void write_to_file(long long int** data, double* times, const char* filename) {
+    FILE *file = fopen(filename, "w");
+    if (file == NULL) {
+        printf("Error opening file.\n");
+        return;
+    }
+
+    fprintf(file, "Metric,Quick,Merge,Bubble,Selection,Insertion,Counting,Bytewise Radix\n");
+    fprintf(file, "Time Taken,%f,%f,%f,%f,%f,%f,%f\n",
+            times[0], times[1], times[2], times[3], times[4], times[5], times[6]);
+    fprintf(file, "Comparisons,%lld,%lld,%lld,%lld,%lld,%lld,%lld\n",
+            data[0][0], data[1][0], data[2][0], data[3][0], data[4][0], data[5][0], data[6][0]);
+    fprintf(file, "Assignments,%lld,%lld,%lld,%lld,%lld,%lld,%lld\n",
+            data[0][1], data[1][1], data[2][1], data[3][1], data[4][1], data[5][1], data[6][1]);
+    fprintf(file, "Max Recursion Depth,%lld,%lld,%lld,%lld,%lld,%lld,%lld\n",
+            data[0][2], data[1][2], data[2][2], data[3][2], data[4][2], data[5][2], data[6][2]);
+    fprintf(file, "Recursive Calls,%lld,%lld,%lld,%lld,%lld,%lld,%lld\n",
+            data[0][3], data[1][3], data[2][3], data[3][3], data[4][3], data[5][3], data[6][3]);
+    fprintf(file, "Memory Allocated,%lld,%lld,%lld,%lld,%lld,%lld,%lld\n",
+            data[0][4], data[1][4], data[2][4], data[3][4], data[4][4], data[5][4], data[6][4]);
+    fclose(file);
+}
+
+
+void benchmark (int* array, int size, bool output_to_file) {
     printf( "Benchmark mode\n"
             "Sorting algorithms available:\n"
             "\tQuick Sort\n"
@@ -114,7 +138,7 @@ void benchmark (int* array, int size) {
         data[i][0] = ctr_compare;
         data[i][1] = ctr_assign;
         data[i][2] = ctr_recursion_depth;
-        data[i][3] = ctr_recursion_call;
+        data[i][3] = ctr_recursion_call; 
         data[i][4] = ctr_mem_alloc;
         // Compare with heuristic
         if (best_time < 0) // First case only
@@ -129,6 +153,11 @@ void benchmark (int* array, int size) {
         free(array_copy);
     }
     print_table(data, times);
+
+    if(output_to_file){
+        write_to_file(data,times,"output.csv");
+        printf("Output escrito para output.csv!\n");
+    }
 
     get_sort_function(best_sort, &sort, name);
     printf("O melhor algoritmo de ordenação foi o %s\n", name);

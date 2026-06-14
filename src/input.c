@@ -2,7 +2,7 @@
 #include "headers/utils.h"
 
 // Lida com as flags da linha de comando
-void deal_with_flags (int argc, char** argv, char** input, SortMethod* mode, int* size) {
+void deal_with_flags (int argc, char** argv, char** input, SortMethod* mode, int* size, bool* output_to_file) {
     bool error = false;
     bool help = false;
     for (int i = 1; i < argc; i++) {
@@ -65,7 +65,11 @@ void deal_with_flags (int argc, char** argv, char** input, SortMethod* mode, int
         // adaptativo
         } else if (strcmp(argv[i], "--adaptativo") == 0 || strcmp(argv[i], "-A") == 0) {
             *mode = ADAPTATIVO;
-        } else
+        } else if(strcmp(argv[i], "--output") == 0 || strcmp(argv[i], "-o") == 0){
+            *output_to_file = true;
+        } 
+        
+        else
             error = true;
     }
     if (error || help) {
@@ -79,6 +83,8 @@ void deal_with_flags (int argc, char** argv, char** input, SortMethod* mode, int
                     "Entrada:\n"
                     "    -i, --input <file>           Path <file> do arquivo de entrada\n" 
                     "    -t, --tamanho <tamanho>      Tamanho do array a ser ordenado\n"
+                    "Saída:\n"
+                    "    -o, --output                  Gera um arquivo CSV com a performance de cada método\n"
                     "Operação:\n"
                     "    -a, --algoritmo <alg>        Fixa um algoritmo de ordenação <alg> dentre as opções:\n"
                     "        bubble\n"
@@ -90,6 +96,7 @@ void deal_with_flags (int argc, char** argv, char** input, SortMethod* mode, int
                     "        selection\n"
                     "    -b, --benchmark              Usa todos os algoritmos de ordenação e compara suas métricas\n"
                     "    -A, --adaptativo             Usa heurísticas para determinar o melhor algoritmo; é a opção padrão\n"
+                    
                     );
         }
         exit(0);
