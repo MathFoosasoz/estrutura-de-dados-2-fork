@@ -57,15 +57,15 @@ long long radix_score (const Metrics* met) {
 // Operações do count sort:
 // 2n max/min, que fazem uma comparação e um assign, 4n
 // alocação de k memória.
-// n subtrações e módulos. Módulo tem uma negação e uma comparação. 3n 
+// n subtrações
 // Por fim, k operações.
-// No total, 7n + 2k
+// No total, 5n + 2k
 
 long long count_score (const Metrics* met) {
     int k = met->largest - met->smallest;
     int n = met->size;
     
-    float n_arithmetic = 5.0f * n; 
+    float n_arithmetic = 3.0f * n; 
     float n_assign = 2.0f * n + k;
     float n_allocations = k; 
     
@@ -126,15 +126,13 @@ long long merge_score (const Metrics* met) {
 // Profundidade da árvore de log(n) 
 // No k-ésimo andar, com k = right-left, a gente terá um loop que:
 /*
-    enquanto left < right, ou seja, k/5 vezes:
+    enquanto left <= right, ou seja, k vezes:
     - fazer 2 comparações
     - fazer 1 soma
-    - fazer uma troca quando left for menor que right. isso ocorre com uma probabilidade de n/5 com uma distribuição de median of three. ou seja, 1/5 de um swap, ou 3 / 5 assigns. e 1/5 de comparação
-    - Um último check  k/5
-
+    - fazer uma troca quando left for menor que right. isso ocorre com uma probabilidade de n/6 com uma distribuição de median of three. ou seja, 1/6 de um swap, ou 3/6 assigns. e 2/6 de soma
 */
-// no total então, temos k(3 + 3/5 + 2/5 + 4/5) = 24k/5 operações, que ocorrerão log(n) vezes.
-// ou seja, em um caso aleatório, podemos esperar 24n/5 log(n) operações.
+// no total então, temos k(3 + 3/6 + 2/6) = 23k/6 operações, que ocorrerão log(n) vezes.
+// ou seja, em um caso aleatório, podemos esperar 23n/6 log(n) operações.
 // Vale ressaltar que seria muito menos complexo analisar esse algoritmo se ele tivesse um pivô simples (como ar[0])
 // Em um caso não aleatório, temos alguns fatores que mudam.
 // A gente passa agora a considerar uma desordem de inversões, como no merge sort
@@ -143,26 +141,34 @@ long long merge_score (const Metrics* met) {
 
 long long quick_sort_score (const Metrics* met) {
     int n = met->size;
+    if (n <= 1) return 0;
 
-    float expected_inversions = (n-1)/2.0f;
-    float inversion_disorder = met->direct_inversion_count / expected_inversions;
-    inversion_disorder = min(1.0f,inversion_disorder);
+    float L = fast_log2(n);
 
-    float swap_by_disorder = n / 5.0f * inversion_disorder;
+    float expected_inversions = (n - 1) / 2.0f;
+    float inversion_disorder = expected_inversions > 0 ? (met->direct_inversion_count / expected_inversions) : 0;
+    
+    float swap_by_disorder = (n / 6.0f) * inversion_disorder;
 
     int range = met->largest - met->smallest;
-    float swap_by_duplicate = n / 2.0f * max(1.0f - (float) range/n,0.0f);
+    float swap_by_duplicate = (n / 2.0f) * max(1.0f - (float)range / n, 0.0f);
 
     float effective_swaps = swap_by_disorder > swap_by_duplicate ? swap_by_disorder : swap_by_duplicate;
-    
-    float n_arithmetic = fast_log2(n) * (3.0f * n + effective_swaps * 4.4f);
-    float n_assign = fast_log2(n) * (effective_swaps * 3.0f);
-    float n_allocations = 0;
-    float n_recursive_calls = 2.0 * n;
-    
-    return (long long)(n_arithmetic * WEIGHT_ARITHMETIC + n_assign * WEIGHT_ASSIGN + n_allocations * WEIGHT_ALLOCATION + n_recursive_calls * WEIGHT_RECURSION); 
-}
 
+    float arithmetic_per_level = 3.0f * n + (2.0f * effective_swaps);
+    float assign_per_level = 3.0f * effective_swaps;
+
+    float overhead_arithmetic = 2.0f * n;
+    float overhead_assign = 15.0f * n; 
+
+    float n_arithmetic = (L * arithmetic_per_level) + overhead_arithmetic;
+    float n_assign = (L * assign_per_level) + overhead_assign;
+    float n_allocations = 0; 
+    
+    float n_recursive_calls = 2.0f * n; 
+    
+    return (long long)(n_arithmetic * WEIGHT_ARITHMETIC + n_assign * WEIGHT_ASSIGN + n_allocations * WEIGHT_ALLOCATION + n_recursive_calls * WEIGHT_RECURSION);
+}
 // Bubble sort nunca é considerado pois ele é estritamente pior do que os outros métodos, em quase todos os casos.
 
 long long bubble_sort_score (const Metrics* met){
