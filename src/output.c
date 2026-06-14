@@ -37,7 +37,8 @@ bool error_flags[7];
 double times[7];
 long long int data[6][7];
 
-const char* metrics_str[] = {
+const char* metrics_col[] = {
+    "Metric",
     "Time Taken",
     "Comparisons",
     "Assignments",
@@ -47,10 +48,7 @@ const char* metrics_str[] = {
     "Score"
 };
 
-// tabela auxiliar para printar o arquivo escolha_heuristica.txt
-// os índices correspondem à enum SortMethod
-
-const char* sorts_table_heuristic[] = {
+const char* sorts_row[] = {
     "RADIX SORT",
     "COUNTING SORT",
     "MERGE SORT",
@@ -58,16 +56,31 @@ const char* sorts_table_heuristic[] = {
     "BUBBLE SORT",
     "SELECTION SORT",
     "INSERTION SORT",
+
+    // nunca usados:
+
     "ALREADY SORTED",
     "REVERSE SORTED"
 };
 
-void print_table() {
-    printf(
-        "                    |    Quick    |    Merge    |    Bubble   |  Selection  |  Insertion  |  Counting   | Bytewise Radix\n"
-    );
+const char *sorts_small[] = {
+    "Radix",
+    "Count",
+    "Merge",
+    "Quick",
+    "Bubble",
+    "Selection",
+    "Insertion"
+};
 
-    printf("%-20s", metrics_str[0]);
+void print_table() {
+    printf("%-20s", metrics_col[0]);
+
+    for (int k = 0; k < 7; k++) {
+        printf("| %11s ", sorts_small[k]);
+    }
+
+    printf("\n%-20s", metrics_col[1]);
 
     for (int k = 0; k < 7; k++) {
         if (!error_flags[k])
@@ -78,11 +91,11 @@ void print_table() {
     
     printf("\n");
 
-    for (int j = 0; j < 6; j++) {
-        printf("%-20s", metrics_str[j+1]);
+    for (int j = 0; j < 5; j++) {
+        printf("%-20s", metrics_col[j+2]);
 
         for (int k = 0; k < 7; k++) {
-            if (!error_flags[k] || j == 5)
+            if (!error_flags[k])
                 printf("| %11lld ", data[j][k]);
             else
                 printf("| %11s ", "(ERRO)");
@@ -90,6 +103,25 @@ void print_table() {
 
         printf("\n");
     }
+
+    printf("%-20s", metrics_col[7]);
+
+    for (int k = 0; k < 7; k++) {
+        switch (k) {
+        case SORT_RADIX:
+        case SORT_COUNT:
+        case SORT_MERGE:
+        case SORT_QUICK:
+            printf("| %11lld ", data[5][k]);
+            break;
+        
+        default:
+            printf("| %11s ", "----");
+            break;
+        }
+    }
+
+    printf("\n");
 
 }
 
@@ -100,9 +132,13 @@ void write_to_file(const char* filename) {
         return;
     }
 
-    fprintf(file, "Metric,Quick,Merge,Bubble,Selection,Insertion,Counting,Bytewise Radix\n");
-    
-    fprintf(file, "%s", metrics_str[0]);
+    fprintf(file, "%s", metrics_col[0]);
+
+    for (int k = 0; k < 7; k++) {
+        fprintf(file, ",%s", sorts_row[k]);
+    }
+
+    fprintf(file, "\n%s", metrics_col[1]);
 
     for (int k = 0; k < 7; k++) {
         if (!error_flags[k])
@@ -115,11 +151,11 @@ void write_to_file(const char* filename) {
         fprintf(
             file,
             "\n"
-            "%s", metrics_str[j+1]
+            "%s", metrics_col[j+2]
         );
 
         for (int k = 0; k < 7; k++) {
-            if (!error_flags[k] || j == 5)
+            if (!error_flags[k] || j == 6)
                 fprintf(file, ",%lld", data[j][k]);
             else
                 fprintf(file, ",(ERRO)");
@@ -148,7 +184,7 @@ void benchmark (int* array, int size, bool output_to_file, bool kill_on_null) {
     Sort sort; // Só usa realmente depois
     char* name = (char*)calloc(32, sizeof(char));
     long long scores[4];
-    SortMethod heuristic_sort = choose_sort(array, size, scores), best_sort;
+    SortMethod heuristic_sort = choose_sort(array, size, scores), best_sort = SORT_RADIX;
     get_sort_function(heuristic_sort, &sort, name);
     printf( "Scores determinados pela heurística:\n"
             "Radix sort: %11lld\n"
@@ -158,15 +194,13 @@ void benchmark (int* array, int size, bool output_to_file, bool kill_on_null) {
             "Algoritmo escolhido pela heurística (mínimo score): %s\n",
             scores[0], scores[1], scores[2], scores[3], name);
 
-    // data[6] = {scores[3], scores[2], 0, 0, 0, scores[1], scores[0]};
-
-    data[5][0] = scores[3];
-    data[5][1] = scores[2];
-    data[5][2] = 0;
-    data[5][3] = 0;
+    data[5][0] = scores[0];
+    data[5][1] = scores[1];
+    data[5][2] = scores[2];
+    data[5][3] = scores[3];
     data[5][4] = 0;
-    data[5][5] = scores[1];
-    data[5][6] = scores[0];
+    data[5][5] = 0;
+    data[5][6] = 0;
 
     // Collect data
     double dt, delta, heuristic_time, best_time = -1;
@@ -175,33 +209,34 @@ void benchmark (int* array, int size, bool output_to_file, bool kill_on_null) {
         SortMethod sort_name;
         array_copy = copy_array(array, size);
         switch (i) {
-        case 0: default:
-            sort = quick_sort;
-            sort_name = SORT_QUICK;
+        default:
+        case 0:
+            sort = bytewise_radix_sort;
+            sort_name = SORT_RADIX;
             break;
         case 1:
-            sort = merge_sort;
-            sort_name = SORT_MERGE;
-            break;
-        case 2:
-            sort = bubble_sort;
-            sort_name = SORT_BUBBLE;
-            break;
-        case 3:
-            sort = selection_sort;
-            sort_name = SORT_SELECTION;
-            break;
-        case 4:
-            sort = insertion_sort;
-            sort_name = SORT_INSERTION;
-            break;
-        case 5:
             sort = count_sort;
             sort_name = SORT_COUNT;
             break;
+        case 2:
+            sort = count_sort;
+            sort_name = SORT_MERGE;
+            break;
+        case 3:
+            sort = quick_sort;
+            sort_name = SORT_QUICK;
+            break;
+        case 4:
+            sort = bubble_sort;
+            sort_name = SORT_BUBBLE;
+            break;
+        case 5:
+            sort = selection_sort;
+            sort_name = SORT_SELECTION;
+            break;
         case 6:
-            sort = bytewise_radix_sort;
-            sort_name = SORT_RADIX;
+            sort = insertion_sort;
+            sort_name = SORT_INSERTION;
             break;
         }
         // Store data
@@ -209,7 +244,7 @@ void benchmark (int* array, int size, bool output_to_file, bool kill_on_null) {
 
         if (sort_abort) {
             if (kill_on_null) {
-                printf("O sort %d falhou em alocar memória. Abortando.\n", i);
+                printf("O sort %s falhou em alocar memória. Abortando.\n", sorts_row[i]);
                 exit(0);
             }
 
@@ -251,13 +286,12 @@ void benchmark (int* array, int size, bool output_to_file, bool kill_on_null) {
 
         FILE* file = fopen("escolha_heuristica.txt", "wt");
         if (file != NULL) {
-            fprintf(file, "%s", sorts_table_heuristic[heuristic_sort]);
+            fprintf(file, "%s", sorts_row[heuristic_sort]);
             fclose(file);
         }
     }
 
-    get_sort_function(best_sort, &sort, name);
-    printf("O melhor algoritmo de ordenação foi o %s\n", name);
+    printf("O melhor algoritmo de ordenação foi o %s\n", sorts_row[best_sort]);
     if (heuristic_sort == best_sort) {
         printf("O modo adaptativo, de fato, escolheu o melhor algoritmo!\n");
     } else {

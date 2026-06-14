@@ -34,7 +34,7 @@ void get_sort_function (SortMethod choice, Sort* sort, char* sort_name) {
         *sort = quick_sort; // Should not be used, but let's make it quick in case someone tries to break the code
         strcpy(sort_name, "REVERSE SORTED");
     } else {
-        printf("wtf?!\nI think you did something wrong\n");
+        printf("I think you did something wrong\n");
         exit(0);
     }
     return;
