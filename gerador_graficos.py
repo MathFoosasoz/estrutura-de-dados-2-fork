@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+#   Pra usar é só colocar o nome das suas pastas com os casos testes em "PASTAS_TESTCASES" e rodar o .py
+#   Não precisa especificar os arquivos dentro delas, ele tenta ler todos automaticamente
+#   Pra tirar da escala log, precisa mudar o argumento do config_graficos de true pra false
+
 
 PASTAS_TESTCASES = [
     "casos_almost_reverse_sorted",
