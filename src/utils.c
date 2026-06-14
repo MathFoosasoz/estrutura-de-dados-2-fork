@@ -4,40 +4,39 @@
 #include "headers/sorts_alternative.h"
 
 /*--------------- Sort Method ---------------*/
+// tabela contendo os sorts, ordenada em relação à enum SortMethod
+const Sort sorts_table[] = {
+    bytewise_radix_sort,
+    count_sort,
+    merge_sort,
+    quick_sort,
+    bubble_sort,
+    selection_sort,
+    insertion_sort
+};
+
+const char* sorts_names[9] = {
+    "RADIX SORT",
+    "COUNTING SORT",
+    "MERGE SORT",
+    "QUICK SORT",
+    "BUBBLE SORT",
+    "SELECTION SORT",
+    "INSERTION SORT",
+    "ALREADY SORTED",
+    "REVERSE SORTED"
+};
+
 // Pega a função pelo seu enum
 void get_sort_function (SortMethod choice, Sort* sort, char* sort_name) {
-    if (choice == SORT_RADIX) {
-        *sort = bytewise_radix_sort;
-        strcpy(sort_name, "RADIX SORT");
-    } else if (choice == SORT_COUNT) {
-        *sort = count_sort;
-        strcpy(sort_name, "COUNTING SORT");
-    } else if (choice == SORT_MERGE) {
-        *sort = merge_sort;
-        strcpy(sort_name, "MERGE SORT");
-    } else if (choice == SORT_QUICK) {
-        *sort = quick_sort;
-        strcpy(sort_name, "QUICK SORT");
-    } else if (choice == SORT_BUBBLE) {
-        *sort = bubble_sort;
-        strcpy(sort_name, "BUBBLE SORT");
-    } else if (choice == SORT_SELECTION) {
-        *sort = selection_sort;
-        strcpy(sort_name, "SELECTION SORT");
-    } else if (choice == SORT_INSERTION) {
-        *sort = insertion_sort;
-        strcpy(sort_name, "INSERTION SORT");
-    } else if (choice == ALREADY_SORTED) {
-        *sort = quick_sort; // Should not be used, but let's make it quick in case someone tries to break the code
-        strcpy(sort_name, "ALREADY SORTED");
-    } else if (choice == REVERSE_SORTED) {
-        *sort = quick_sort; // Should not be used, but let's make it quick in case someone tries to break the code
-        strcpy(sort_name, "REVERSE SORTED");
+    if (0 <= choice && choice <= 6) {
+        *sort = sorts_table[choice];
+        if (sort_name != NULL)
+            strcpy(sort_name, sorts_names[choice]);
     } else {
-        printf("I think you did something wrong\n");
+        printf("Erro fatal: escolha inválida de sort.\n");
         exit(0);
     }
-    return;
 }
 
 /*--------------- Counters ---------------*/

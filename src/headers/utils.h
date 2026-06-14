@@ -3,13 +3,14 @@
 #include <stdio.h>
 #include <time.h>
 
+#ifndef SORT_METHOD
+#define SORT_METHOD
+
 /*--------------- Sort funcion type ---------------*/
 typedef void (*Sort)(int*, int);  // Tipo de uma função de ordenação
 
 /*--------------- Sort Method ---------------*/
 // Used by generic_sort and main files
-#ifndef SORT_METHOD
-#define SORT_METHOD
 
 typedef enum {
     ADAPTATIVO = -2,     // Escolhe um pela heurística
@@ -24,6 +25,10 @@ typedef enum {
     ALREADY_SORTED = 7,  // Caso, quando definindo as métricas, assim se perceba
     REVERSE_SORTED = 8   // Caso, quando definindo as métricas, assim se perceba
 } SortMethod;
+
+// tabela dos nomes dos sorts, alinhadas com a enum acima
+
+extern const char* sorts_names[9];
 
 #endif
 

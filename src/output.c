@@ -1,12 +1,17 @@
 #include "headers/output.h"
 
 double test_sort(Sort sort, int* array, int size, bool kill_on_null) {
-    time_t begin = clock();
+    struct timespec begin;
+    struct timespec end;
+
+    double dt;
+
+    timespec_get(&begin, TIME_UTC);
     sort(array, size);
-    time_t end = clock();
+    timespec_get(&end, TIME_UTC);
 
     if (!sort_abort) {
-        double dt = (end - begin) / (double) CLOCKS_PER_SEC;
+        double dt = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
 
         if (!is_sorted(array, size)) {
             print_array(array, size);
@@ -46,21 +51,6 @@ const char* metrics_col[] = {
     "Recursive Calls",
     "Memory Allocated",
     "Score"
-};
-
-const char* sorts_row[] = {
-    "RADIX SORT",
-    "COUNTING SORT",
-    "MERGE SORT",
-    "QUICK SORT",
-    "BUBBLE SORT",
-    "SELECTION SORT",
-    "INSERTION SORT",
-
-    // nunca usados:
-
-    "ALREADY SORTED",
-    "REVERSE SORTED"
 };
 
 const char *sorts_small[] = {
@@ -135,14 +125,14 @@ void write_to_file(const char* filename) {
     fprintf(file, "%s", metrics_col[0]);
 
     for (int k = 0; k < 7; k++) {
-        fprintf(file, ",%s", sorts_row[k]);
+        fprintf(file, ",%s", sorts_names[k]);
     }
 
     fprintf(file, "\n%s", metrics_col[1]);
 
     for (int k = 0; k < 7; k++) {
         if (!error_flags[k])
-            fprintf(file, ",%lf", times[k]);
+            fprintf(file, ",%.15lf", times[k]);
         else
             fprintf(file, ",(ERRO)");
     }
@@ -186,13 +176,16 @@ void benchmark (int* array, int size, bool output_to_file, bool kill_on_null) {
     long long scores[4];
     SortMethod heuristic_sort = choose_sort(array, size, scores), best_sort = SORT_RADIX;
     get_sort_function(heuristic_sort, &sort, name);
-    printf( "Scores determinados pela heurística:\n"
-            "Radix sort: %11lld\n"
-            "Count sort: %11lld\n"
-            "Merge sort: %11lld\n"
-            "Quick sort: %11lld\n"
-            "Algoritmo escolhido pela heurística (mínimo score): %s\n",
-            scores[0], scores[1], scores[2], scores[3], name);
+ 
+    printf(
+        "Scores determinados pela heurística:\n"
+        "Radix sort: %11lld\n"
+        "Count sort: %11lld\n"
+        "Merge sort: %11lld\n"
+        "Quick sort: %11lld\n"
+        "Algoritmo escolhido pela heurística (mínimo score): %s\n",
+        scores[0], scores[1], scores[2], scores[3], name
+    );
 
     data[5][0] = scores[0];
     data[5][1] = scores[1];
@@ -208,43 +201,14 @@ void benchmark (int* array, int size, bool output_to_file, bool kill_on_null) {
     for (int i = 0; i < 7; i++) {
         SortMethod sort_name;
         array_copy = copy_array(array, size);
-        switch (i) {
-        default:
-        case 0:
-            sort = bytewise_radix_sort;
-            sort_name = SORT_RADIX;
-            break;
-        case 1:
-            sort = count_sort;
-            sort_name = SORT_COUNT;
-            break;
-        case 2:
-            sort = count_sort;
-            sort_name = SORT_MERGE;
-            break;
-        case 3:
-            sort = quick_sort;
-            sort_name = SORT_QUICK;
-            break;
-        case 4:
-            sort = bubble_sort;
-            sort_name = SORT_BUBBLE;
-            break;
-        case 5:
-            sort = selection_sort;
-            sort_name = SORT_SELECTION;
-            break;
-        case 6:
-            sort = insertion_sort;
-            sort_name = SORT_INSERTION;
-            break;
-        }
+        
+        get_sort_function(i, &sort, NULL);
         // Store data
         dt = test_sort(sort, array_copy, size, false);
 
         if (sort_abort) {
             if (kill_on_null) {
-                printf("O sort %s falhou em alocar memória. Abortando.\n", sorts_row[i]);
+                printf("O sort %s falhou em alocar memória. Abortando.\n", sorts_names[i]);
                 exit(0);
             }
 
@@ -286,12 +250,12 @@ void benchmark (int* array, int size, bool output_to_file, bool kill_on_null) {
 
         FILE* file = fopen("escolha_heuristica.txt", "wt");
         if (file != NULL) {
-            fprintf(file, "%s", sorts_row[heuristic_sort]);
+            fprintf(file, "%s", sorts_names[heuristic_sort]);
             fclose(file);
         }
     }
 
-    printf("O melhor algoritmo de ordenação foi o %s\n", sorts_row[best_sort]);
+    printf("O melhor algoritmo de ordenação foi o %s\n", sorts_names[best_sort]);
     if (heuristic_sort == best_sort) {
         printf("O modo adaptativo, de fato, escolheu o melhor algoritmo!\n");
     } else {
