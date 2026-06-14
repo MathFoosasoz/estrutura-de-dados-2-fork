@@ -15,3 +15,5 @@ casos_fully_reversed/
 casos_random_full_range/
 casos_random_small_range/
 casos_repetition_50pct/
+output.csv
+escolha_heuristica.txt

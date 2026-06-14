@@ -37,13 +37,28 @@ bool error_flags[7];
 double times[7];
 long long int data[5][7];
 
-const char *metrics_str[] = {
+const char* metrics_str[] = {
     "Time Taken",
     "Comparisons",
     "Assignments",
     "Max Recursion Depth",
     "Recursive Calls",
     "Memory Allocated"
+};
+
+// tabela auxiliar para printar o arquivo escolha_heuristica.txt
+// os índices correspondem à enum SortMethod
+
+const char* sorts_table_heuristic[] = {
+    "BYTEWISE RADIX SORT",
+    "COUNTING SORT",
+    "MERGE SORT",
+    "QUICK SORT",
+    "BUBBLE SORT",
+    "SELECTION SORT",
+    "INSERTION SORT",
+    "ALREADY SORTED",
+    "REVERSE SORTED"
 };
 
 void print_table() {
@@ -78,7 +93,7 @@ void print_table() {
 }
 
 void write_to_file(const char* filename) {
-    FILE *file = fopen(filename, "w");
+    FILE* file = fopen(filename, "w");
     if (file == NULL) {
         printf("Error opening file.\n");
         return;
@@ -220,6 +235,14 @@ void benchmark (int* array, int size, bool output_to_file, bool kill_on_null) {
     if(output_to_file){
         write_to_file("output.csv");
         printf("Output escrito para output.csv!\n");
+
+        // escolha heurística
+
+        FILE* file = fopen("escolha_heuristica.txt", "wt");
+        if (file != NULL) {
+            fprintf(file, "%s", sorts_table_heuristic[heuristic_sort]);
+            fclose(file);
+        }
     }
 
     get_sort_function(best_sort, &sort, name);
