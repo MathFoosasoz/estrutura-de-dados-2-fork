@@ -75,7 +75,8 @@ void internal_bytewise_radix_sort (int* array, const int n, const unsigned char 
     }
 
     for (unsigned char byte_idx = 0; byte_idx < 4 - skippable_bytes; ++byte_idx) {
-        memset(radix_bucket, 0, 256 * sizeof(int)); // Desprezado nos counters
+        memset(radix_bucket, 0, 256 * sizeof(int));
+        ctr_assign += 256 / 2; // Reduz-se o peso por economizar em derreferências
         for (int i = 0; i < n; ++i) {
             unsigned char current_byte = get_nth_byte(array[i], byte_idx);
             radix_bucket[current_byte]++;
@@ -87,7 +88,8 @@ void internal_bytewise_radix_sort (int* array, const int n, const unsigned char 
             unsigned char current_byte = get_nth_byte(array[i], byte_idx);
             assign(&tmp[--radix_bucket[current_byte]], array[i]);
         }
-        memcpy(array, tmp, n * sizeof(int)); // Desprezado nos counters
+        memcpy(array, tmp, n * sizeof(int));
+        ctr_assign += n / 2; // Reduz-se o peso por economizar em derreferências
     }
 
     // isso desfaz a inversão que fizemos no começo
