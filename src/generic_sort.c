@@ -114,8 +114,10 @@ long long merge_score (const Metrics* met) {
     float n_arithmetic = n + work_arithmetic;
     float n_assign = work_assigns;
     float n_allocations = n;
+
+    float n_recursive_calls = 2.0 * n - 1.0;
     
-    return (long long)(n_arithmetic * WEIGHT_ARITHMETIC + n_assign * WEIGHT_ASSIGN + n_allocations * WEIGHT_ALLOCATION);
+    return (long long)(n_arithmetic * WEIGHT_ARITHMETIC + n_assign * WEIGHT_ASSIGN + n_allocations * WEIGHT_ALLOCATION + n_recursive_calls * WEIGHT_RECURSION);
 }
 
 
@@ -156,15 +158,16 @@ long long quick_sort_score (const Metrics* met) {
     float n_arithmetic = fast_log2(n) * (3.0f * n + effective_swaps * 4.4f);
     float n_assign = fast_log2(n) * (effective_swaps * 3.0f);
     float n_allocations = 0;
+    float n_recursive_calls = 2.0 * n;
     
-    return (long long)(n_arithmetic * WEIGHT_ARITHMETIC + n_assign * WEIGHT_ASSIGN + n_allocations * WEIGHT_ALLOCATION); 
+    return (long long)(n_arithmetic * WEIGHT_ARITHMETIC + n_assign * WEIGHT_ASSIGN + n_allocations * WEIGHT_ALLOCATION + n_recursive_calls * WEIGHT_RECURSION); 
 }
 
 // Bubble sort nunca é considerado pois ele é estritamente pior do que os outros métodos, em quase todos os casos.
 
 long long bubble_sort_score (const Metrics* met){
     const int n = met->size;
-
+    return n * n;
 }
 
 // No caso do insertion sort, ele não é considerado pois precisa saber do número inversões no array (a complexidade é, na prática, O(n * numero_de_inversoes))

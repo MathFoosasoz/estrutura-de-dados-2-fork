@@ -22,8 +22,9 @@ typedef struct {
 
 typedef enum {
     WEIGHT_ARITHMETIC = 1,
-    WEIGHT_ASSIGN = 1,      
-    WEIGHT_ALLOCATION = 1  
+    WEIGHT_ASSIGN = 2,      
+    WEIGHT_ALLOCATION = 1,
+    WEIGHT_RECURSION = 1
 } Weight;
 
 #endif
